@@ -96,7 +96,7 @@ main {
   font: inherit;
   border: 1px solid #00695c;
   color: #00695c;
-  margin: 1rem;
+  margin: 1rem 0rem;
   background: white;
   border-radius: 3px;
   cursor: pointer;
