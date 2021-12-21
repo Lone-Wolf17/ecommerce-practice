@@ -41,6 +41,9 @@ module.exports = class Cart {
 
       const updatedCart = { ...JSON.parse(fileContent) };
       const product = updatedCart.product.find((prod) => prod.id === id);
+
+      if (!product) return;
+
       const productQty = product.qty;
       // delete product from cart by filtering it out
       updatedCart.products = updatedCart.products.filter(
@@ -53,6 +56,17 @@ module.exports = class Cart {
       fs.writeFile(p, JSON.stringify(updatedCart), (err) => {
         if (err) console.log(err);
       });
+    });
+  }
+
+  static getCart(callback) {
+    fs.readFile(p, (err, fileContent) => {
+      const cart = JSON.parse(fileContent);
+      if (err) {
+        callback(null);
+      } else {
+        callback(cart);
+      }
     });
   }
 };
