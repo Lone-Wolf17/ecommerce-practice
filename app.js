@@ -2,6 +2,11 @@ const path = require("path");
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
+const mongoConnect = require('./util/database').mongoConnect;
+const User = require('./models/user');
+const dotenv = require("dotenv");
+dotenv.config({ path: "./config.env" }); // Load Config
+
 
 // using ejs templating engine
 app.set("view engine", "ejs");
@@ -16,10 +21,22 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use((req, res, next) => {
+    User.findById('5baa2528563f16379fc8a610')
+      .then(user => {
+        req.user = new User(user.name, user.email, user.cart, user._id);
+        next();
+      })
+      .catch(err => console.log(err));
+  });
+  
+
 app.use("/admin", adminRoutes);
 app.use("/", shopRouter);
 
 const errorController = require("./controllers/errors");
 app.use(errorController.get404);
 
-app.listen(3000);
+mongoConnect(() => {
+    app.listen(3000);
+  });
