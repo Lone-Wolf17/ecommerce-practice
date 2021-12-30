@@ -1,15 +1,13 @@
-const mongodb = require("mongodb");
-const MongoClient = mongodb.MongoClient;
+const mongoose = require('mongoose');
 
 let _db;
 
 const mongoConnect = (callback) => {
-  MongoClient.connect(process.env.MONGO_URI, {
+  mongoose.connect(process.env.MONGO_URI, {
     useUnifiedTopology: true
   })
     .then((client) => {
       console.log("Connected!");
-      _db = client.db();
       callback();
     })
     .catch((err) => {

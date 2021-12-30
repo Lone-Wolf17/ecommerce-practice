@@ -20,7 +20,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
-
+app.use((req, res, next) => {
+  User.findById("61c2dc8bc179ed796a2ef5aa")
+    .then((user) => {
+      req.user = user;
+      console.log('User:::: ' + req.user);
+      next();
+    })
+    .catch((err) => console.log(err));
+});
 
 app.use("/admin", adminRoutes);
 app.use("/", shopRouter);
@@ -29,13 +37,18 @@ const errorController = require("./controllers/errors");
 app.use(errorController.get404);
 
 mongoConnect(() => {
-  app.listen(3000);
-  app.use((req, res, next) => {
-    User.findById("61c2dc8bc179ed796a2ef5aa")
-      .then((user) => {
-        req.user = new User(user.name, user.email, user.cart, user._id);
-        next();
-      })
-      .catch((err) => console.log(err));
+  User.findOne().then(user => {
+    if (!user) {
+      const user = new User({
+        name: 'Max',
+        email: 'max@test.com',
+        cart: {
+          items: []
+        }
+      });
+      user.save();
+    }
   });
+  app.listen(3000);
+  console.log("Callback Called!!!");
 });
