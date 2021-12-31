@@ -7,7 +7,7 @@ exports.getLogin = (req, res, next) => {
   res.render("auth/login", {
     path: Routes.login,
     pageTitle: "Login",
-    isAuthenticated: req.isLoggedIn,
+    isAuthenticated: req.session.isLoggedIn 
   });
 };
 
