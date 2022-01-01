@@ -6,6 +6,7 @@ const User = require("./models/user");
 const dotenv = require("dotenv");
 const session = require("express-session");
 const csrf = require('csurf');
+const flashMessages  = require('connect-flash');
 const MongoDBSessionStore = require("connect-mongodb-session")(session);
 
 dotenv.config({ path: "./config.env" }); // Load Config
@@ -40,7 +41,9 @@ app.use(
     store: sessionStore,
   })
 );
+
 app.use(csrfProtection);
+app.use(flashMessages());
 
 app.use((req, res, next) => {
   if (!req.session.user) {
