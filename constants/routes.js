@@ -10,4 +10,5 @@ module.exports = {
   createOrder: "/create-order",
   resetPassword: "/reset",
   newPassword: "/new-password",
+  editProduct: "/admin/edit-product"
 };
