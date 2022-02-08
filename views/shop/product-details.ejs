@@ -1,8 +1,8 @@
-<%- include('../partials/head.ejs') %>
+<%- include('../includes/head.ejs') %>
     </head>
 
     <body>
-        <%- include('../partials/navigation.ejs') %>
+        <%- include('../includes/navigation.ejs') %>
         <main class="centered">
             <h1><%= product.title %></h1>
             <hr>
@@ -12,7 +12,7 @@
             <h2><%= product.price %></h2>
             <p><%= product.description %></p>
             <% if (isAuthenticated) { %>
-                <%- include('../partials/add-to-cart.ejs', {product: product}) %>
+                <%- include('../includes/add-to-cart.ejs', {product: product}) %>
             <% } %>
         </main>
-        <%- include('../partials/end.ejs') %>
+        <%- include('../includes/end.ejs') %>

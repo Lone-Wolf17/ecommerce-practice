@@ -1,9 +1,9 @@
-<%- include('../partials/head.ejs') %>
+<%- include('../includes/head.ejs') %>
     <link rel="stylesheet" href="/css/orders.css">
     </head>
 
     <body>
-        <%- include('../partials/navigation.ejs') %>
+        <%- include('../includes/navigation.ejs') %>
         <main>
             <% if (orders.length <= 0) { %>
                 <h1>Nothing there!</h1>
@@ -22,4 +22,4 @@
                 </ul>
             <% } %>
         </main>
-        <%- include('../partials/end.ejs') %>
+        <%- include('../includes/end.ejs') %>

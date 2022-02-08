@@ -1,9 +1,9 @@
-<%- include('../partials/head.ejs') %>
+<%- include('../includes/head.ejs') %>
     <link rel="stylesheet" href="/css/cart.css">
     </head>
 
     <body>
-        <%- include('../partials/navigation.ejs') %>
+        <%- include('../includes/navigation.ejs') %>
         <main>
             <% if (products.length > 0) { %>
                 <ul class="cart__item-list">
@@ -31,4 +31,4 @@
                 <h1>No Products in Cart!</h1>
             <% } %>
         </main>
-        <%- include('../partials/end.ejs') %>
+        <%- include('../includes/end.ejs') %>
