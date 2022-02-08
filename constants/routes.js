@@ -11,5 +11,6 @@ module.exports = {
   resetPassword: "/reset",
   newPassword: "/new-password",
   editProduct: "/admin/edit-product",
-  addProduct:  "/admin/add-product"
+  addProduct:  "/admin/add-product",
+  error500: '/500'
 };
