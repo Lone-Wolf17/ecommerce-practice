@@ -13,12 +13,22 @@ router.get(Routes.login, authController.getLogin);
 router.get(Routes.signup, authController.getSignup);
 
 /// route:: /login => POST
-router.post(Routes.login, authController.postLogin);
+router.post(
+  Routes.login,
+  /// Data Validation
+  [
+    body("email").isEmail().withMessage("Please enter a valid email address."),
+    body("password", "Password has to be valid.")
+      .isLength({ min: 5 })
+      .isAlphanumeric(),
+  ],
+  authController.postLogin
+);
 
 /// route:: /signup => POST
 router.post(
   Routes.signup,
-  // Data Validations 
+  // Data Validations
   [
     check("email")
       .isEmail()
