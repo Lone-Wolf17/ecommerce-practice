@@ -9,6 +9,7 @@ const csrf = require("csurf");
 const flashMessages = require("connect-flash");
 const errorController = require("./controllers/errors");
 const Routes = require("./constants/routes");
+const multer = require("multer");
 const MongoDBSessionStore = require("connect-mongodb-session")(session);
 
 dotenv.config({ path: "./config.env" }); // Load Config
@@ -31,9 +32,38 @@ const authRoutes = require("./routes/auth");
 // set up logger
 app.use(morgan("dev"));
 
+// setup serving static files
+app.use(express.static(path.join(__dirname, "public")));
+app.use("/images", express.static(path.join(__dirname, "images")));
+
+/// set up multer storage
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString() + "-" + file.originalname);
+  },
+});
+
+/// setup multer file filter
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+);
 app.use(
   session({
     secret: "fuck boy",
@@ -79,12 +109,14 @@ app.use(authRoutes);
 app.get(Routes.error500, errorController.get500);
 app.use(errorController.get404);
 app.use((error, req, res, next) => {
-  // res.redirect(Routes.error500);
-  res.status(500).render("error-500", {
-    pageTitle: "Error!!!",
-    path: "/500",
-    isAuthenticated: req.session.isLoggedIn,
-  });
+  console.log(error);
+  res.redirect(Routes.error500);
+  // console.log("Session:::" + req.session);
+  // res.status(500).render("error-500", {
+  //   pageTitle: "Error!!!",
+  //   path: Routes.error500,
+  //   isAuthenticated: req.session.isLoggedIn,
+  // });
 });
 
 mongoConnect(() => {
