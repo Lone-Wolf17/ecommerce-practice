@@ -17,5 +17,19 @@
             <div class="centered">
                 <h2>Total: <%= totalSum %></h2>
             </div>
+            <div class="centered">
+                <button id="order-btn" class="btn">Place Order</button>
+                <script src="https://js.stripe.com/v3/"></script>
+                <script>
+                    // This is your test publishable API key.
+const stripe = Stripe("pk_test_51KVvjCBsuqCKYujE0ukvpJk82FO5VdiAw6xKaFZu8mYBKyWDgjtkH9ltFCoVSUGSYFUi3yOlBhsbWp6woUKHw8eo00zwHL5ESY");
+var orderBtn = document.getElementById('order-btn');
+orderBtn.addEventListener('click', function () {
+    stripe.redirectToCheckout({
+        sessionId: '<%= sessionId %>'
+    });
+})
+                </script>
+            </div>
         </main>
         <%- include('../includes/end.ejs') %>

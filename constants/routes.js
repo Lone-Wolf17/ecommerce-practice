@@ -7,6 +7,8 @@ module.exports = {
   cart: "/cart",
   cartDeleteItem: "/cart-delete-item",
   checkout: "/checkout",
+  checkoutSuccess: '/checkout/success',
+  checkoutCancel: '/checkout/cancel',
   orders: "/orders",
   createOrder: "/create-order",
   resetPassword: "/reset",
