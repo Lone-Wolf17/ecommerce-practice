@@ -6,6 +6,7 @@ module.exports = {
   products: "/products",
   cart: "/cart",
   cartDeleteItem: "/cart-delete-item",
+  checkout: "/checkout",
   orders: "/orders",
   createOrder: "/create-order",
   resetPassword: "/reset",
