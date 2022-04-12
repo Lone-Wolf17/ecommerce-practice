@@ -1,16 +1,23 @@
+const fs = require('fs');
 const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
-const mongoConnect = require("./util/database").mongoConnect;
-const User = require("./models/user");
+const helmet = require("helmet");
+const compression = require('compression');
 const dotenv = require("dotenv");
 const session = require("express-session");
 const csrf = require("csurf");
 const flashMessages = require("connect-flash");
-const errorController = require("./controllers/errors");
-const Routes = require("./constants/routes");
 const multer = require("multer");
 const MongoDBSessionStore = require("connect-mongodb-session")(session);
+
+const errorController = require("./controllers/errors");
+const Routes = require("./constants/routes");
+const mongoConnect = require("./util/database").mongoConnect;
+const User = require("./models/user");
+const adminRoutes = require("./routes/admin.js");
+const shopRoutes = require("./routes/shop");
+const authRoutes = require("./routes/auth");
 
 dotenv.config({ path: "./config.env" }); // Load Config
 
@@ -25,12 +32,16 @@ const sessionStore = new MongoDBSessionStore({
 
 const csrfProtection = csrf();
 
-const adminRoutes = require("./routes/admin.js");
-const shopRoutes = require("./routes/shop");
-const authRoutes = require("./routes/auth");
+const accessLogStream = fs.createWriteStream(
+  path.join(__dirname, 'access.log'), {flags: 'a'}
+);
 
 // set up logger
-app.use(morgan("dev"));
+app.use(morgan("dev", {stream: accessLogStream}));
+// set up secure respose headers
+app.use(helmet());
+// set up asset compression
+app.use(compression());
 
 // setup serving static files
 app.use(express.static(path.join(__dirname, "public")));
