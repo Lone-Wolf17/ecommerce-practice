@@ -1,9 +1,10 @@
-const express = require("express");
-const router = express.Router();
+import {Router} from 'express';
 
-const Routes = require('../constants/routes');
-const shopController = require("../controllers/shop.js");
-const isAuth = require('../middleware/is-auth');
+import Routes from '../constants/routes';
+import * as shopController from '../controllers/shop';
+import isAuth from '../middleware/is-auth';
+
+const router = Router();
 
 /// route:: / => GET
 router.get(Routes.index, shopController.getIndex);
@@ -42,4 +43,4 @@ router.get(Routes.orders, isAuth, shopController.getOrders);
 /// route:: /orders => GET
 router.get('/orders/:orderId', isAuth, shopController.getInvoice);
 
-module.exports = router;
+export default router;

@@ -4,13 +4,14 @@
   "description": "Simple Ecommerce project to Practice node",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "start": "nodemon app.js",
     "start-server": "node app.js"
   },
   "author": "Lone Wolf",
   "license": "ISC",
   "dependencies": {
+    "@typegoose/typegoose": "^9.8.0",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "connect-flash": "^0.1.1",
@@ -32,6 +33,21 @@
     "stripe": "^8.203.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "@types/bcryptjs": "^2.4.2",
+    "@types/compression": "^1.7.2",
+    "@types/connect-flash": "^0.0.37",
+    "@types/connect-mongodb-session": "^2.4.2",
+    "@types/csurf": "^1.11.2",
+    "@types/express": "^4.17.13",
+    "@types/express-session": "^1.17.4",
+    "@types/mongoose": "^5.11.97",
+    "@types/morgan": "^1.9.3",
+    "@types/multer": "^1.4.7",
+    "@types/node": "^17.0.24",
+    "@types/pdfkit": "^0.12.4",
+    "chai": "^4.3.6",
+    "mocha": "^9.2.2",
+    "nodemon": "^2.0.15",
+    "ts-node-dev": "^1.1.8"
   }
 }

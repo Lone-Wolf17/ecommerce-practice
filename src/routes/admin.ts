@@ -1,14 +1,16 @@
-const express = require("express");
-const router = express.Router();
-const adminController = require("../controllers/admin.js");
-const isAuth = require("../middleware/is-auth");
-const { body } = require("express-validator");
+import {Router} from 'express';
+import {body} from 'express-validator';
+
+import * as AdminController from '../controllers/admin';
+import isAuth from '../middleware/is-auth';
+
+const router = Router();
 
 /// route:: /admin/add-product => GET
-router.get("/add-product", isAuth, adminController.getAddProduct);
+router.get("/add-product", isAuth, AdminController.getAddProduct);
 
 /// route:: /admin/products => GET
-router.get("/products", isAuth, adminController.getProducts);
+router.get("/products", isAuth, AdminController.getProducts);
 
 /// route:: /admin/add-product => POST
 router.post(
@@ -27,11 +29,11 @@ router.post(
       .trim(),
   ],
   isAuth,
-  adminController.postAddProduct
+  AdminController.postAddProduct
 );
 
 /// route:: /admin/edit-product/:productId => GET
-router.get("/edit-product/:productId", isAuth, adminController.getEditProduct);
+router.get("/edit-product/:productId", isAuth, AdminController.getEditProduct);
 
 /// route:: /admin/edit-product => POST
 router.post(
@@ -50,10 +52,10 @@ router.post(
       .trim(),
   ],
   isAuth,
-  adminController.postEditProduct
+  AdminController.postEditProduct
 );
 
 /// route:: /admin/product/:productId => DELETE
-router.delete("/product/:productId", isAuth, adminController.deleteProduct);
+router.delete("/product/:productId", isAuth, AdminController.deleteProduct);
 
-module.exports = router;
+export default router;

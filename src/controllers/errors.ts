@@ -1,4 +1,6 @@
-exports.get404 = (req, res, next) => {
+import { Request, Response, NextFunction } from "express";
+
+export const get404 = (req: Request, res : Response, next : NextFunction) => {
   res
     .status(404)
     .render("error-404", {
@@ -9,7 +11,7 @@ exports.get404 = (req, res, next) => {
 };
 
 
-exports.get500 = (req, res, next) => {
+export const get500 = (req : Request, res : Response, next : NextFunction) => {
   res
     .status(500)
     .render("error-500", {
