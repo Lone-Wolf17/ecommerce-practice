@@ -15,7 +15,7 @@ import * as ErrorController from "./controllers/errors";
 import Routes from "./constants/routes";
 import { mongoConnect } from "./util/database";
 import { UserModel } from "./models/user";
-import adminRoutes from "./routes/admin.js";
+import adminRoutes from "./routes/admin";
 import shopRoutes from "./routes/shop";
 import authRoutes from "./routes/auth";
 import { CustomRequestObject } from "./models/custom-request-object";
@@ -49,14 +49,14 @@ if ((process.env.NODE_ENV = "dev")) {
   app.use(morgan("dev", { stream: accessLogStream }));
 }
 
-// set up secure respose headers
-app.use(helmet());
+// // set up secure respose headers
+// app.use(helmet());
 // set up asset compression
 app.use(compression());
 
 // setup serving static files
-app.use(express.static(path.join(__dirname, "public")));
-app.use("/images", express.static(path.join(__dirname, "images")));
+app.use(express.static(path.join(__dirname, "..", "public")));
+app.use("/images", express.static(path.join(__dirname, "..", "images")));
 
 /// set up multer storage
 const fileStorage = multer.diskStorage({
@@ -69,7 +69,11 @@ const fileStorage = multer.diskStorage({
 });
 
 /// setup multer file filter
-const fileFilter = (req: CustomRequestObject, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+const fileFilter = (
+  req: CustomRequestObject,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback
+) => {
   if (
     file.mimetype === "image/png" ||
     file.mimetype === "image/jpg" ||
@@ -130,11 +134,25 @@ app.use(authRoutes);
 /// Error handling
 app.get(Routes.error500, ErrorController.get500);
 app.use(ErrorController.get404);
-app.use((error: HttpException, req: CustomRequestObject, res: Response, next: NextFunction) => {
-  console.log(error);
-  res.redirect(Routes.error500);
-});
+app.use(
+  (
+    error: HttpException,
+    req: CustomRequestObject,
+    res: Response,
+    next: NextFunction
+  ) => {
+    console.log(error);
+    res.redirect(Routes.error500);
+  }
+);
 
 mongoConnect(() => {
-  app.listen(3000);
+  app.listen({ port: 3000 }, () => {
+    console.log(
+      `🚀 Server ready!!! 
+    
+      Visit ===> http://localhost:3000
+    `
+    );
+  });
 });

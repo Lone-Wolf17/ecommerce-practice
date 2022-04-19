@@ -28,10 +28,10 @@ router.post(Routes.cartDeleteItem, isAuth, shopController.postCartDeleteProduct)
 router.get(Routes.checkout, isAuth, shopController.getCheckout);
 
 /// route:: /checkout/success => GET
-router.get(Routes.checkoutSuccess, isAuth, shopController.postOrder);
+router.get(Routes.checkoutSuccess, isAuth, shopController.getCheckoutSuccess);
 
 /// route:: /checkout/cancel => GET
-router.get(Routes.checkoutCancel, isAuth, shopController.getCheckoutSuccess);
+router.get(Routes.checkoutCancel, isAuth, shopController.getCheckoutCancel);
 
 
 /// route:: /create-order => POST

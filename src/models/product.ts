@@ -1,5 +1,5 @@
 import { prop as Property, getModelForClass, Ref } from "@typegoose/typegoose";
-import {Schema} from 'mongoose';
+import {Types} from 'mongoose';
 
 import { User } from "./user";
 
@@ -19,7 +19,7 @@ export class Product {
   @Property({ required: true })
   public user!: Ref<User>;
 
-  _id!: Schema.Types.ObjectId
+  _id!: Types.ObjectId
 }
 
 export const ProductModel = getModelForClass(Product);

@@ -4,13 +4,14 @@ import {
   DocumentType,
   isDocument,
 } from "@typegoose/typegoose";
-import { Schema } from "mongoose";
+import { Types } from "mongoose";
 
-import { Cart } from "./cart";
+import { Cart, CartItemModel, CartModel } from "./cart";
+import { OrderModel } from "./order";
 import { Product } from "./product";
 
 export class User {
-  _id!: Schema.Types.ObjectId;
+  _id!: Types.ObjectId;
 
   @Property()
   public name!: string;
@@ -27,30 +28,42 @@ export class User {
   @Property({ required: false })
   public resetTokenExpiration?: Date;
 
-  @Property()
+  @Property({ type: Cart, _id: false })
   public cart!: Cart;
 
   public async addToCart(this: DocumentType<User>, product: Product) {
     const cartProductIndex = this.cart.items.findIndex((cp) => {
       return cp.product!.toString() === product._id.toString();
     });
+    console.log(this.cart.items);
     let newQuantity = 1;
     const updatedCartItems = [...this.cart.items];
-
     if (cartProductIndex >= 0) {
       newQuantity = this.cart.items[cartProductIndex].quantity + 1;
       updatedCartItems[cartProductIndex].quantity = newQuantity;
     } else {
       updatedCartItems.push({
-        product: product,
+        product: product._id,
         quantity: newQuantity,
       });
     }
-    const updatedCart = {
-      items: updatedCartItems,
-    };
-    this.cart = updatedCart;
-    return this.save();
+    // console.log(updatedCartItems, "Updated Cart Items");
+    // const updatedCart: Cart = {
+    //   items: updatedCartItems,
+    // };
+    // this.cart = updatedCart;
+    // this.cart = {
+    //   items: updatedCartItems,
+    // };
+    // console.log(CartModel.schema, "Cart Model");
+    // console.log(
+    //   "*****************************************************************"
+    // );
+    // console.log(CartItemModel.schema, "Cart Item Model");
+    await this.updateOne({ $set: { "cart.items": updatedCartItems } });
+    // console.log("Point F");
+    await this.save();
+    // console.log(this.cart, "User Cart");
   }
 
   public async removeFromCart(this: DocumentType<User>, productId: number) {

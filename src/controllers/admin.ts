@@ -40,8 +40,6 @@ export const postAddProduct = (
   const price = req.body.price;
   const description = req.body.description;
 
-  console.log("Point 1:::::");
-
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).render("admin/edit-product", {
@@ -59,8 +57,6 @@ export const postAddProduct = (
     });
   }
 
-  console.log("Point 2:::::");
-
   if (!image) {
     return res.status(422).render("admin/edit-product", {
       pageTitle: "Add Product",
@@ -77,8 +73,6 @@ export const postAddProduct = (
     });
   }
 
-  console.log("Point 3:::::");
-
   const imageUrl = image.path;
 
   const product = new ProductModel({
@@ -86,7 +80,7 @@ export const postAddProduct = (
     price: price,
     description: description,
     imageUrl: imageUrl,
-    userId: req.user,
+    user: req.user?._id,
   });
   product
     .save()
@@ -216,15 +210,16 @@ export const getProducts = (
   const page = +(req.query.page || 1);
   let totalItems: number;
 
-  ProductModel.find({ userId: req.user!._id })
+  ProductModel.find({ user: req.user!._id })
     .countDocuments()
     .then((numProducts) => {
       totalItems = numProducts;
-      return ProductModel.find({ userId: req.user!._id })
+      return ProductModel.find({ user: req.user!._id })
         .skip((page - 1) * ITEMS_PER_PAGE)
         .limit(ITEMS_PER_PAGE);
     })
     .then((products) => {
+      console.log(products);
       res.render("admin/products", {
         prods: products,
         pageTitle: "Admin Products",
@@ -261,7 +256,7 @@ export const deleteProduct = async (
     deleteFile(product.imageUrl);
     await ProductModel.deleteOne({
       _id: prodId,
-      userId: req.user!._id,
+      user: req.user!._id,
     });
     console.log("DESTROYED PRODUCT");
     res.status(200).json({ message: "Success!!" });

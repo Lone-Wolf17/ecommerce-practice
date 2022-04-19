@@ -8,12 +8,10 @@ import { ProductModel } from "../models/product";
 import HttpException from "../models/http-exception";
 import { CustomRequestObject } from "../models/custom-request-object";
 import { UserModel } from "../models/user";
-import { isDocument } from "@typegoose/typegoose";
+import { isDocument, isDocumentArray } from "@typegoose/typegoose";
 import { OrderModel } from "../models/order";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2020-08-27",
-});
+import { ProductOrder } from "../models/product-order";
+import Routes from "../constants/routes";
 
 const ITEMS_PER_PAGE: number = 2;
 
@@ -60,7 +58,7 @@ export const getProduct = async (
   try {
     const product = await ProductModel.findById(prodId);
 
-    res.render("shop/product-detail", {
+    res.render("shop/product-details", {
       product: product,
       pageTitle: product?.title || "No Product Found",
       path: "/products",
@@ -114,10 +112,13 @@ export const getCart = async (
   //   // .execPopulate()
   //   .then((user) => {
   try {
-    const user = await UserModel.findById(req.user!._id).populate(
-      "cart.items.product"
+    const user = await UserModel.findById(req.user!._id).populate({
+      path: "cart.items.product",
+      model: "Product",
+    });
+    const products: any[] = user!.cart.items.map(
+      (item) => item as ProductOrder
     );
-    const products = user!.cart.items;
 
     res.render("shop/cart", {
       path: "/cart",
@@ -145,7 +146,7 @@ export const postCart = async (
     }
     const user = await UserModel.findById(req.user!._id);
 
-    user!.addToCart(product);
+    await user!.addToCart(product);
 
     res.redirect("/cart");
   } catch (e) {
@@ -175,33 +176,49 @@ export const getCheckout = async (
   res: Response,
   next: NextFunction
 ) => {
-  const user = await UserModel.findById(req.user!._id).populate(
-    "cart.items.product"
-  );
+  const user = await UserModel.findById(req.user!._id).populate({
+    path: "cart.items.product",
+    model: "Product",
+  });
   const cartItems = user!.cart.items;
   let totalValue = 0;
   let stripeLineItems: any[] = [];
+
+  const stripe = new Stripe(`${process.env.STRIPE_SECRET_KEY}`, {
+    apiVersion: "2020-08-27",
+    typescript: true,
+  });
+
+  const product = await stripe.products.create({ name: "T-shirt" });
+  const price = await stripe.prices.create({
+    product: product.id,
+    unit_amount: 2000,
+    currency: "usd",
+  });
 
   cartItems.forEach((cartItem) => {
     if (isDocument(cartItem.product)) {
       const product = cartItem.product;
       totalValue += cartItem.quantity * product.price;
       stripeLineItems.push({
-        name: product!.title,
+        // title: product!.title,
         description: product!.description,
-        amount: product!.price * 100,
-        currency: "usd",
+        price: price.id,
         quantity: cartItem.quantity,
       });
     }
   });
 
+  // console.log(process.env.STRIPE_SECRET_KEY, "Stripe Key");
+  // console.log(stripe);
+  // console.log(stripeLineItems);
   stripe.checkout.sessions
     .create({
       payment_method_types: ["card"],
       line_items: stripeLineItems,
       success_url: req.protocol + "://" + req.get("host") + "/checkout/success",
       cancel_url: req.protocol + "://" + req.get("host") + "/checkout/cancel",
+      mode: "payment",
     })
     .then((session) => {
       res.render("shop/checkout", {
@@ -220,25 +237,32 @@ export const getCheckout = async (
     });
 };
 
+export const getCheckoutCancel = async (
+  req: CustomRequestObject,
+  res: Response,
+  next: NextFunction
+) => {
+  res.redirect(Routes.cart);
+};
+
 export const getCheckoutSuccess = async (
   req: CustomRequestObject,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const user = await UserModel.findById(req.user!._id).populate(
-      "cart.items.product"
-    );
+    const user = await UserModel.findById(req.user!._id).populate({
+      path: "cart.items.product",
+      model: "Product",
+    });
 
-    // Since cart.items.product has been populated, 
+    // Since cart.items.product has been populated,
     // the CartItems is now the same as the ProductOrder
     const products = user!.cart.items;
 
     const order = new OrderModel({
-      user: {
-        email: req.user!.email,
-        userId: req.user!._id,
-      },
+      userEmail: req.user!.email,
+      userId: req.user!._id,
       products: products,
     });
     await order.save();
@@ -256,17 +280,17 @@ export const postOrder = async (
   next: NextFunction
 ) => {
   try {
-    const user = await UserModel.findById(req.user!._id).populate(
-      "cart.items.product"
-    );
+    const user = await UserModel.findById(req.user!._id).populate({
+      path: "cart.items.product",
+      model: "Product",
+    });
 
-
-    // Since cart.items.product has been populated, 
+    // Since cart.items.product has been populated,
     // the CartItems is now the same as the ProductOrder
     const products = user!.cart.items;
 
     const order = await OrderModel.create({
-      email: req.user!.email,
+      userEmail: req.user!.email,
       userId: req.user!._id,
       products: products,
     });
@@ -284,8 +308,9 @@ export const getOrders = async (
   res: Response,
   next: NextFunction
 ) => {
-  OrderModel.find({ "user.userId": req.user!._id })
+  OrderModel.find({ userId: req.user!._id })
     .then((orders) => {
+      console.log(orders);
       res.render("shop/orders", {
         path: "/orders",
         pageTitle: "Your Orders",
