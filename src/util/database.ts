@@ -2,7 +2,8 @@ import mongoose, {ConnectOptions} from 'mongoose';
 
 export const mongoConnect = (callback: Function) => {
   mongoose.connect(process.env.MONGO_URI!, {
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    autoIndex: true
   } as ConnectOptions )
     .then((client) => {
       console.log("Connected!");
