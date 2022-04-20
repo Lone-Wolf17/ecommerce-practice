@@ -16,7 +16,7 @@ export class User {
   @Property()
   public name!: string;
 
-  @Property({ required: true })
+  @Property({ required: true, unique: true })
   public email!: string;
 
   @Property({ required: true })
